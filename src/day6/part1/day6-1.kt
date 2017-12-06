@@ -1,4 +1,4 @@
-package day6
+package day6.part1
 
 fun main(args: Array<String>) {
     println(solve(arrayOf(0, 2, 7, 0))) // 0 2 7 0 = 5
