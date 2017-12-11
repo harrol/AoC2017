@@ -2,7 +2,6 @@ package day11.part2
 
 import java.io.File
 import kotlin.math.abs
-import kotlin.math.max
 
 fun main(args: Array<String>) {
     println(solve(parse("ne,ne,ne"))) // 3
