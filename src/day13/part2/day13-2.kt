@@ -5,15 +5,12 @@ import java.io.File
 fun main(args: Array<String>) {
 
     println(solve(parseInput("input/day13/test-input.txt")))
-
     // Takes way to long, need to optimize
     println(solve(parseInput("input/day13/input.txt")))
-
 }
 
 private fun solve(scanners: List<Scanner>): Int {
-    val layers = scanners.maxBy { scanner -> scanner.layer }!!.layer
-
+    val lastLayer = scanners.maxBy { scanner -> scanner.layer }!!.layer
 
     var scannerMap = hashMapOf<Int, Scanner>()
     scanners.forEach {
@@ -22,31 +19,27 @@ private fun solve(scanners: List<Scanner>): Int {
 
     var delay = 0
 
-    while (isCaught(layers, scannerMap)) {
+    do {
+        val isCaught = isCaught(lastLayer, copy(scannerMap))
 
-        scannerMap.values.forEach {
-            it.reset()
-        }
-
-        repeat(delay, {
-            scannerMap.values.forEach {
-                it.next()
-            }
-        })
-
+        if(delay % 10000 == 0) println("At $delay")
         delay++
 
-        if (delay % 1000 == 0) println("At $delay")
-    }
+        scannerMap.values.forEach {
+            it.next()
+        }
 
-    println(scanners)
+    } while (isCaught)
 
     return delay - 1
 }
 
-private fun copy(original: Map<Int, Scanner>):  Map<Int, Scanner> {
+private fun copy(original: Map<Int, Scanner>): HashMap<Int, Scanner> {
     val newMap = hashMapOf<Int, Scanner>()
-    original.forEach{ (i, s) -> newMap.put(i, s.copy())}
+    original.forEach { (i, s) ->
+        val copy = Scanner(s.layer, s.range, s.position, s.direction)
+        newMap.put(i, copy)
+    }
     return newMap
 }
 
@@ -77,23 +70,21 @@ private fun toScanner(line: String): Scanner {
     return Scanner(split[0].trim().toInt(), split[1].trim().toInt())
 }
 
-data class Scanner(val layer: Int, val range: Int, var position: Int = 1) {
-    private var direction = 1 // 1 = moving down, -1 = moving up
+data class Scanner(val layer: Int, val range: Int, var position: Int = 1, var direction: Int = 1) {
 
     fun next() {
+        fixDirection()
         position += direction
 
+    }
+
+    fun fixDirection() {
         if (position == range) {
             direction = -1
         }
         if (position == 1) {
             direction = 1
         }
-    }
-
-    fun reset() {
-        position = 1
-        direction = 1
     }
 
 }
